@@ -7,6 +7,18 @@ from .config import get_api_key, load_cache
 from .gitorg import get_issue
 
 
+PRIVATE_INSTANCE_STATUSES = (
+    'ABANDONED',
+    'OUT_OF_TIME',
+    'PENDING_PARENTAL_CONSENT',
+    'UNASSIGNED_BY_MENTOR',
+)
+
+PRIVATE_INSTANCE_ATTRIBUTES = (
+    'modified',
+    'deadline',
+)
+
 _client = None
 _org = {}
 _tasks = {}
@@ -78,6 +90,37 @@ def get_instances():
     return _instances
 
 
+def cleanse_tasks(tasks):
+    cleansed_tasks = dict(
+        (task_id, task)
+        for task_id, task
+        in tasks.items()
+        if task['status'] == 2
+    )
+
+    for task in cleansed_tasks.values():
+        del task['mentors']
+
+    return cleansed_tasks
+
+
+def cleanse_instances(instances):
+    cleansed_instances = dict(
+        (instance_id, instance)
+        for instance_id, instance
+        in instances.items()
+        if instance['status'] not in PRIVATE_INSTANCE_STATUSES
+    )
+
+    for instance in cleansed_instances.values():
+        if instance['status'] != 'COMPLETED':
+            instance['status'] = 'CLAIMED'
+            for key in PRIVATE_INSTANCE_ATTRIBUTES:
+                del instance[key]
+
+    return cleansed_instances
+
+
 def get_students():
     students = {}
     for _, instance in get_instances().items():
@@ -99,17 +142,8 @@ def get_students():
         student['instances'].append(instance)
 
 
-def get_effective_students(students):
-    for student in list(students):
-        instances = student['instances']
-        instances = [instance for instance in instances
-                     if instance['status'] != 'ABANDONED']
-        if instances:
-            yield student
-
-
-def get_issue_related_students(students):
-    for student in list(get_effective_students(students)):
+def get_issue_related_students():
+    for student in list(get_students()):
         instances = student['instances']
         for instance in instances:
             task = get_task(instance['task_definition_id'])
@@ -119,8 +153,8 @@ def get_issue_related_students(students):
                     break
 
 
-def get_linked_students(students):
-    for student in list(get_issue_related_students(students)):
+def get_linked_students():
+    for student in list(get_issue_related_students()):
         instances = student['instances']
         for instance in instances:
             task = get_task(instance['task_definition_id'])
@@ -142,5 +176,7 @@ def get_linked_students(students):
                               (task_id, url, ', '.join(issue.assignees)))
                     else:
                         student['username'] = issue.assignees[0]
+                        print('student %s is %s because of %s' %
+                              (student['id'], issue.assignees[0], url))
                         yield student
                         break

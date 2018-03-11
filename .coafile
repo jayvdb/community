@@ -7,17 +7,14 @@ use_spaces = True
 [all.whitespace]
 use_spaces = True
 bears = SpaceConsistencyBear
-default_actions = *: ApplyPatchAction
 
 [all.python]
 language = Python
 bears = QuotesBear, PyFlakesBear
 preferred_quotation = '
-default_actions = *: ApplyPatchAction
 
 [all.autopep8]
 bears = PEP8Bear, PycodestyleBear
-default_actions = PEP8Bear: ApplyPatchAction
 
 [all.linelength]
 bears = LineLengthBear

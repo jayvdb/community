@@ -25,7 +25,8 @@ before_install:
 
 jobs:
   include:
-    - python: 3.6
+    - language: python
+      python: 3.6
       stage: moban
       env: false
       before_install: false

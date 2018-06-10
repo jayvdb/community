@@ -20,6 +20,7 @@ jobs:
   include:
     - python: 3.6
       stage: moban
+      env: false
       before_install: false
       install: pip install moban
       script: .ci/check_moban.sh

@@ -12,21 +12,22 @@ env:
   # A proper build with the tokens available
   - AUTH=true
 
-before_install:
-  - printf '%s\n'
-           "$(cat test-requirements.txt requirements.txt)"
-           > requirements.txt
-  - npm i -g jshint
-
 jobs:
   include:
     - language: python
       python: 3.6
       stage: moban
+      env: true
       before_install: false
       install: pip install moban
       script: .ci/check_moban.sh
       after_success: false
+
+before_install:
+  - printf '%s\n'
+           "$(cat test-requirements.txt requirements.txt)"
+           > requirements.txt
+  - npm i -g jshint
 
 script:
   - ./.ci/build.sh

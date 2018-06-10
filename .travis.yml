@@ -6,8 +6,8 @@ cache:
 
 env:
   global:
-  - ENCRYPTION_LABEL: "defac9b1fa56"
-  - COMMIT_AUTHOR_EMAIL: "nobody@coala.io"
+    - ENCRYPTION_LABEL: "defac9b1fa56"
+    - COMMIT_AUTHOR_EMAIL: "nobody@coala.io"
 
 env:
   # This more closely emulates a forked build

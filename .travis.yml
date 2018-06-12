@@ -36,6 +36,7 @@ before_install:
 script:
   - ./.ci/build.sh
   - rm -rf private/
+  - find . -type f -name '*.bak'
   - coala --non-interactive -V
 
 notifications:
